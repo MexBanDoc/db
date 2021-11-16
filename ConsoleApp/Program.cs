@@ -1,20 +1,22 @@
 using System;
 using System.Linq;
 using Game.Domain;
+using Tests;
 
 namespace ConsoleApp
 {
     class Program
     {
-        private readonly IUserRepository userRepo;
         private readonly IGameRepository gameRepo;
         private readonly Random random = new Random();
+        private readonly IUserRepository userRepo;
 
         private Program(string[] args)
         {
-            userRepo = new InMemoryUserRepository();
+            var db = TestMongoDatabase.Create();
+            db.DropCollection(MongoUserRepository.CollectionName);
+            userRepo = new MongoUserRepository(db);
             gameRepo = new InMemoryGameRepository();
-            ы
         }
 
         public static void Main(string[] args)
@@ -144,7 +146,7 @@ namespace ConsoleApp
 
         private PlayerDecision GetAiDecision()
         {
-            return (PlayerDecision)Math.Min(3, 1 + random.Next(4));
+            return (PlayerDecision) Math.Min(3, 1 + random.Next(4));
         }
 
         private void UpdatePlayersWhenGameFinished(GameEntity game)
