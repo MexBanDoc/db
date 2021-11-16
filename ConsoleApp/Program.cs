@@ -14,6 +14,7 @@ namespace ConsoleApp
         {
             userRepo = new InMemoryUserRepository();
             gameRepo = new InMemoryGameRepository();
+            ы
         }
 
         public static void Main(string[] args)
