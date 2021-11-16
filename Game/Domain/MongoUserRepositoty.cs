@@ -1,12 +1,14 @@
 using System;
+using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Game.Domain
 {
     public class MongoUserRepository : IUserRepository
     {
-        private readonly IMongoCollection<UserEntity> userCollection;
         public const string CollectionName = "users";
+        private readonly IMongoCollection<UserEntity> userCollection;
 
         public MongoUserRepository(IMongoDatabase database)
         {
@@ -15,39 +17,52 @@ namespace Game.Domain
 
         public UserEntity Insert(UserEntity user)
         {
-            //TODO: Ищи в документации InsertXXX.
-            throw new NotImplementedException();
+            userCollection.InsertOne(user);
+            return user;
         }
 
         public UserEntity FindById(Guid id)
         {
-            //TODO: Ищи в документации FindXXX
-            throw new NotImplementedException();
+            var user = userCollection.Find(x => x.Id == id).FirstOrDefault();
+            return user;
         }
 
         public UserEntity GetOrCreateByLogin(string login)
         {
-            //TODO: Это Find или Insert
-            throw new NotImplementedException();
+            var user = userCollection.Find(x => x.Login == login).FirstOrDefault();
+            if (user != null)
+            {
+                return user;
+            }
+
+            return Insert(new UserEntity(Guid.NewGuid())
+            {
+                Login = login
+            });
         }
 
         public void Update(UserEntity user)
         {
-            //TODO: Ищи в документации ReplaceXXX
-            throw new NotImplementedException();
+            userCollection.ReplaceOne(x => x.Id == user.Id, user);
         }
 
         public void Delete(Guid id)
         {
-            throw new NotImplementedException();
+            userCollection.DeleteOne(x => x.Id == id);
         }
 
         // Для вывода списка всех пользователей (упорядоченных по логину)
         // страницы нумеруются с единицы
         public PageList<UserEntity> GetPage(int pageNumber, int pageSize)
         {
-            //TODO: Тебе понадобятся SortBy, Skip и Limit
-            throw new NotImplementedException();
+            var totalCount = userCollection.CountDocuments(x => true);
+            var page = userCollection
+                .Find(x => true)
+                .SortBy(x => x.Login)
+                .Skip((pageNumber - 1) * pageSize)
+                .Limit(pageSize)
+                .ToList();
+            return new(page, totalCount, pageNumber, pageSize);
         }
 
         // Не нужно реализовывать этот метод
