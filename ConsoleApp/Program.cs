@@ -194,7 +194,7 @@ namespace ConsoleApp
                 var playerInfo = new List<string>();
                 foreach (var player in players)
                 {
-                    playerInfo.Add($"{player.Name}: {turn.playerDecisions[player.UserId]}");
+                    playerInfo.Add($"{player.Name}: {turn.playerDecisions[player.UserId.ToString()]}");
                 }
                 Console.WriteLine(string.Join("\n", playerInfo));
                 Console.WriteLine($"Winner: {players.Where(p => p.UserId == turn.WinnerId).Select(p => p.Name)}");

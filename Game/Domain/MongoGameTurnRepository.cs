@@ -12,6 +12,10 @@ namespace Game.Domain
         public MongoGameTurnRepository(IMongoDatabase db)
         {
             turnsCollection = db.GetCollection<GameTurnEntity>(CollectionName);
+            var options = new CreateIndexOptions {Unique = true};
+            turnsCollection.Indexes.CreateOne(
+                new CreateIndexModel<GameTurnEntity>(
+                    Builders<GameTurnEntity>.IndexKeys.Ascending(x => x.TurnIndex), options));
         }
         
         public IReadOnlyList<GameTurnEntity> GetLastTurns(Guid gameId, int turnsCount)

@@ -17,17 +17,17 @@ namespace Game.Domain
         public int TurnIndex { get; }
         
         [BsonElement]
-        public Dictionary<Guid, PlayerDecision> playerDecisions { get; }
+        public Dictionary<string, PlayerDecision> playerDecisions { get; }
 
         //TODO: Придумать какие свойства должны быть в этом классе, чтобы сохранять всю информацию о закончившемся туре.
-        public GameTurnEntity(Guid gameId, int turnIndex, Dictionary<Guid, PlayerDecision> playerDecisions, Guid winnerId)
+        public GameTurnEntity(Guid gameId, int turnIndex, Dictionary<string, PlayerDecision> playerDecisions, Guid winnerId)
             : this(Guid.Empty, gameId, turnIndex, playerDecisions, winnerId)
         {
 
         }
         
         [BsonConstructor]
-        public GameTurnEntity(Guid id, Guid gameId, int turnIndex, Dictionary<Guid, PlayerDecision> playerDecisions, Guid winnerId)
+        public GameTurnEntity(Guid id, Guid gameId, int turnIndex, Dictionary<string, PlayerDecision> playerDecisions, Guid winnerId)
         {
             Id = id;
             GameId = gameId;
