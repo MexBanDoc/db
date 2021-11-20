@@ -197,7 +197,8 @@ namespace ConsoleApp
                     playerInfo.Add($"{player.Name}: {turn.playerDecisions[player.UserId]}");
                 }
                 Console.WriteLine(string.Join("\n", playerInfo));
-                Console.WriteLine($"Winner: {turn.WinnerId.ToString()}");
+                Console.WriteLine($"Winner: {players.Where(p => p.UserId == turn.WinnerId).Select(p => p.Name)}");
+                Console.WriteLine();
             }
         }
     }
