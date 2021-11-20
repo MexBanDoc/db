@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Game.Domain;
 using Tests;
@@ -10,12 +11,14 @@ namespace ConsoleApp
         private readonly IGameRepository gameRepo;
         private readonly Random random = new Random();
         private readonly IUserRepository userRepo;
+        private readonly IGameTurnRepository turnsRepository;
 
         private Program(string[] args)
         {
             var db = TestMongoDatabase.Create();
             userRepo = new MongoUserRepository(db);
             gameRepo = new MongoGameRepository(db);
+            turnsRepository = new MongoGameTurnRepository(db);
         }
 
         public static void Main(string[] args)
@@ -127,8 +130,9 @@ namespace ConsoleApp
 
             if (game.HaveDecisionOfEveryPlayer)
             {
-                // TODO: Сохранить информацию о прошедшем туре в IGameTurnRepository. Сформировать информацию о закончившемся туре внутри FinishTurn и вернуть её сюда.
-                game.FinishTurn();
+                // TODO: Сохранить информацию о прошедшем туре в IGameTurnRepository.
+                // Сформировать информацию о закончившемся туре внутри FinishTurn и вернуть её сюда.
+                turnsRepository.Insert(game.FinishTurn());
             }
 
             ShowScore(game);
@@ -182,8 +186,19 @@ namespace ConsoleApp
         private void ShowScore(GameEntity game)
         {
             var players = game.Players;
+            const int turnsCount = 5;
             // TODO: Показать информацию про 5 последних туров: кто как ходил и кто в итоге выиграл. Прочитать эту информацию из IGameTurnRepository
-            Console.WriteLine($"Score: {players[0].Name} {players[0].Score} : {players[1].Score} {players[1].Name}");
+            var lastTurns = turnsRepository.GetLastTurns(game.Id, turnsCount);
+            foreach (var turn in lastTurns)
+            {
+                var playerInfo = new List<string>();
+                foreach (var player in players)
+                {
+                    playerInfo.Add($"{player.Name}: {turn.playerDecisions[player.UserId]}");
+                }
+                Console.WriteLine(string.Join("\n", playerInfo));
+                Console.WriteLine($"Winner: {turn.WinnerId.ToString()}");
+            }
         }
     }
 }
