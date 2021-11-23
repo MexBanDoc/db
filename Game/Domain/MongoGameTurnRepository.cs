@@ -8,23 +8,25 @@ namespace Game.Domain
     {
         public const string CollectionName = "gameTurns";
         private readonly IMongoCollection<GameTurnEntity> turnsCollection;
-        
+
         public MongoGameTurnRepository(IMongoDatabase db)
         {
             turnsCollection = db.GetCollection<GameTurnEntity>(CollectionName);
-            var options = new CreateIndexOptions {Unique = true};
             turnsCollection.Indexes.CreateOne(
                 new CreateIndexModel<GameTurnEntity>(
-                    Builders<GameTurnEntity>.IndexKeys.Ascending(x => x.TurnIndex), options));
+                    Builders<GameTurnEntity>.IndexKeys
+                        .Ascending(t => t.GameId)
+                        .Ascending(x => x.TurnIndex)));
         }
-        
+
         public IReadOnlyList<GameTurnEntity> GetLastTurns(Guid gameId, int turnsCount)
         {
-            return turnsCollection.Find(t => t.GameId == gameId)
-            .SortByDescending(t => t.TurnIndex)
-            .Limit(turnsCount)
-            .SortBy(t => t.TurnIndex)
-            .ToList();
+            var turns = turnsCollection.Find(t => t.GameId == gameId)
+                .SortByDescending(t => t.TurnIndex)
+                .Limit(turnsCount)
+                .ToList();
+            turns.Reverse();
+            return turns;
         }
 
         public GameTurnEntity Insert(GameTurnEntity entity)

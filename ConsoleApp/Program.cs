@@ -10,8 +10,8 @@ namespace ConsoleApp
     {
         private readonly IGameRepository gameRepo;
         private readonly Random random = new Random();
-        private readonly IUserRepository userRepo;
         private readonly IGameTurnRepository turnsRepository;
+        private readonly IUserRepository userRepo;
 
         private Program(string[] args)
         {
@@ -196,8 +196,10 @@ namespace ConsoleApp
                 {
                     playerInfo.Add($"{player.Name}: {turn.playerDecisions[player.UserId.ToString()]}");
                 }
+
+                Console.WriteLine($"Turn: {turn.TurnIndex + 1}/{game.TurnsCount}");
                 Console.WriteLine(string.Join("\n", playerInfo));
-                Console.WriteLine($"Winner: {players.Where(p => p.UserId == turn.WinnerId).Select(p => p.Name)}");
+                Console.WriteLine($"Winner: {players.Where(p => p.UserId == turn.WinnerId).Select(p => p.Name).SingleOrDefault() ?? "Draw"}");
                 Console.WriteLine();
             }
         }
